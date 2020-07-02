@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using pro_Server.Helpers;
 using pro_Server.Services;
 
 namespace pro_Server
@@ -28,7 +31,9 @@ namespace pro_Server
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            //services.AddSingleton<WeatherForecastService>();
+
+            services.AddBlazoredLocalStorage();
+            services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
             services.AddHttpClient<IWeatherForecastService, WeatherForecastService>(client =>
             {
@@ -54,6 +59,8 @@ namespace pro_Server
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
