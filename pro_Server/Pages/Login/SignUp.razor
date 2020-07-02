@@ -42,12 +42,12 @@
 
 @code {
 
-    private UserInfo user;
+    private User user;
     public string LoginMesssage { get; set; }
 
     protected override Task OnInitializedAsync()
     {
-        user = new UserInfo();
+        user = new User();
         return base.OnInitializedAsync();
     }
 

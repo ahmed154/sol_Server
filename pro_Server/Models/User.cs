@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace pro_Server.Models
 {
-    public class UserInfo
+    public class User
     {
         [EmailAddress]
         [Required]
@@ -15,5 +15,7 @@ namespace pro_Server.Models
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
         public string Source { get; set; }
+        public string Token { get; set; }
+        public DateTime Expiration { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 
 using Microsoft.AspNetCore.Components.Authorization;
+using pro_Server.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,11 +39,11 @@ namespace pro_Server.Helpers
             var user = new ClaimsPrincipal(identity);
             return await Task.FromResult(new AuthenticationState(user));
         }
-        public void MarkUserAsAuthenticated(string emailAddress)
+        public async Task MarkUserAsAuthenticated(User User)
         {
             var identity = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Name, emailAddress),
+                new Claim(ClaimTypes.Name, User.EmailAddress),
             }, "apiauth_type");
 
 
@@ -53,8 +54,8 @@ namespace pro_Server.Helpers
         public async Task MarkUserAsLoggedOut()
         {
             await localStorageService.RemoveItemAsync("emailAddress");
-            //await _localStorageService.RemoveItemAsync("refreshToken");
-            //await _localStorageService.RemoveItemAsync("accessToken");
+            await localStorageService.RemoveItemAsync("token");
+            await localStorageService.RemoveItemAsync("expiration");
 
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);

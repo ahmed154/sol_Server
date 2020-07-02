@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using BlazorServerApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -35,6 +36,10 @@ namespace pro_Server
             services.AddBlazoredLocalStorage();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
+            services.AddHttpClient<IUserService, UserService>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:44305/");
+            });
             services.AddHttpClient<IWeatherForecastService, WeatherForecastService>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:44305/");

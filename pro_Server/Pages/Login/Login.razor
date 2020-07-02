@@ -2,9 +2,12 @@
 @page "/login"
 @using pro_Server.Models
 @using pro_Server.Helpers
+@using pro_Server.Services
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject IUserService userService
+@inject IJSRuntime jsRunTime
 
 <EditForm Model="@User" OnValidSubmit="@ValidateUser">
     <div>
@@ -31,17 +34,18 @@
     </div>
     <br />
     <div class="col-12 row" style="text-align:left; font-weight:bold">
-        @* <span class="col-12">@LoginMesssage</span>*@
+         <span class="col-12">@LoginMesssage</span>
     </div>
 </EditForm>
 
 @code {
 
-    private UserInfo User;
+    private User User;
+    public string LoginMesssage { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        User = new UserInfo();
+        User = new User();
     }
 
     private async Task<bool> ValidateUser()
@@ -49,10 +53,21 @@
         //assume that user is valid
         //call an API
 
-        ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(User.EmailAddress);
-        NavigationManager.NavigateTo("/");
+        var returnedUser = await userService.LoginAsync(User);
 
-        await localStorageService.SetItemAsync("emailAddress", User.EmailAddress);
+        if (string.IsNullOrEmpty(returnedUser.Token))
+        {
+            LoginMesssage = "Invalid username or password";
+        }
+        else
+        {
+            await localStorageService.SetItemAsync("emailAddress", returnedUser.EmailAddress);
+            await localStorageService.SetItemAsync("token", returnedUser.Token);
+            await localStorageService.SetItemAsync("expiration", returnedUser.Expiration);
+
+            await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
+            NavigationManager.NavigateTo("/index");
+        }
 
         return await Task.FromResult(true);
     }
