@@ -1,10 +1,11 @@
-﻿@page "/index"
+﻿@page "/"
+@page "/index"
 
-    <AuthorizeView>
-        <Authorized>
-            Welcome, @context.User.Identity.Name
-        </Authorized>
-        <NotAuthorized>
-            You are signed out !
-        </NotAuthorized>
-    </AuthorizeView>
+<AuthorizeView>
+    <Authorized>
+        Welcome, @context.User.Identity.Name
+    </Authorized>
+    <NotAuthorized>
+        You are signed out !
+    </NotAuthorized>
+</AuthorizeView>

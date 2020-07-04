@@ -2,22 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blazored.LocalStorage;
-using BlazorServerApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using pro_Server.Handlers;
-using pro_Server.Helpers;
-using pro_Server.Models;
-using pro_Server.Services;
+using BlazorApp1.Areas.Identity;
+using BlazorApp1.Data;
 
-namespace pro_Server
+namespace BlazorApp1
 {
     public class Startup
     {
@@ -32,22 +31,15 @@ namespace pro_Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddTransient<ValidateHeaderHandler>();
-            services.AddBlazoredLocalStorage();
-            services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-
-            services.AddHttpClient<IUserService, UserService>(client =>
-            {
-                client.BaseAddress = new Uri("https://localhost:44305/");
-            });
-            services.AddHttpClient<IWeatherForecastService<WeatherForecast>, WeatherForecastService<WeatherForecast>>(client =>
-            {
-                client.BaseAddress = new Uri("https://localhost:44305/");
-            }).AddHttpMessageHandler<ValidateHeaderHandler>();
-
-            
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services.AddSingleton<WeatherForecastService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +48,7 @@ namespace pro_Server
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -68,11 +61,13 @@ namespace pro_Server
             app.UseStaticFiles();
 
             app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });

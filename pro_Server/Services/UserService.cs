@@ -50,13 +50,12 @@ namespace BlazorServerApp.Services
 
             return await Task.FromResult(returnedUser);
         }
-
         public async Task<User> RegisterUserAsync(User user)
         {
-            user.Password = Utility.Encrypt(user.Password);
+            //user.Password = Utility.Encrypt(user.Password);
             string serializedUser = JsonConvert.SerializeObject(user);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "api/accounts/RegisterUser");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "api/accounts/create");
             requestMessage.Content = new StringContent(serializedUser);
 
             requestMessage.Content.Headers.ContentType
@@ -67,7 +66,11 @@ namespace BlazorServerApp.Services
             var responseStatusCode = response.StatusCode;
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            var returnedUser = JsonConvert.DeserializeObject<User>(responseBody);
+            var returnedUser = new User();
+            if (responseStatusCode == System.Net.HttpStatusCode.OK)
+            {
+                returnedUser = JsonConvert.DeserializeObject<User>(responseBody);
+            }
 
             return await Task.FromResult(returnedUser);
         }

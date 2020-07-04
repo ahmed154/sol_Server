@@ -1,0 +1,27 @@
+﻿@using pro_Server.Helpers
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<AuthorizeView>
+    <Authorized>
+        <a href="Identity/Account/Manage">Hello, @context.User.Identity.Name!</a>
+        @*<form method="post" action="Identity/Account/LogOut">
+            <button type="submit" class="nav-link btn btn-link">Log out</button>
+        </form>*@
+        <a href="/" @onclick="(() => Logout())">Logout</a>
+    </Authorized>
+    <NotAuthorized>
+        @*<a href="Identity/Account/Register">Register</a>*@
+        @*<a href="Identity/Account/Login">Log in</a>*@
+        <a href="/login">Login</a>
+        <a href="/signup">Register</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    public async Task Logout()
+    {
+        await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
+        NavigationManager.NavigateTo("");
+    }
+}

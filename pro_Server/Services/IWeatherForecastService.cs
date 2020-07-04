@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace pro_Server.Services
 {
-    public interface IWeatherForecastService
+    public interface IWeatherForecastService<T>
     {
-        Task<List<WeatherForecast>> GetWeatherForecasts();
+        Task<List<T>> GetAllAsync(string requestUri);
     }
 }
