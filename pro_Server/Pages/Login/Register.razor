@@ -1,0 +1,86 @@
+﻿@page  "/signup"
+@using pro_Server.Models
+@using pro_Server.Helpers
+@using pro_Server.Services
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject IUserService userService
+@inject IJSRuntime jsRunTime
+
+
+<EditForm Model="@User" OnValidSubmit="@RegisterUser">
+    <div class="signup-form">
+        <div class="box">
+            <h2>Create Account</h2>
+            <p class="lead">It's free and hardly takes more than 30 seconds.</p>
+            <p style="font-size:12px; color:indianred">@LoginMesssage</p>
+            <br />
+
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-paper-plane"></i></span>
+                    <input @bind="User.EmailAddress" type="email" class="form-control" name="email" placeholder="Email Address" required="required">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                    <input @bind="User.Password" type="password" class="form-control" name="password" placeholder="Password" required="required">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="fa fa-lock"></i>
+                        <i class="fa fa-check"></i>
+                    </span>
+                    <input @bind="User.ConfirmPassword" type="password" class="form-control" name="confirm_password" placeholder="Confirm Password" required="required">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Sign Up</button>
+            </div>
+            <p class="small text-center">By clicking the Sign Up button, you agree to our <br><a href="#">Terms &amp; Conditions</a>, and <a href="#">Privacy Policy</a>.</p>
+        </div>
+        <div class="text-center">Already have an account? <a href="login">Login here</a></div>
+    </div>
+</EditForm>
+<link href="css/LoginForm.css" rel="stylesheet" />
+
+@code {
+
+    private User User;
+    public string LoginMesssage { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        User = new User();
+        return base.OnInitializedAsync();
+    }
+
+    private async Task<bool> RegisterUser()
+    {
+        var returnedUser = await userService.RegisterUserAsync(User);
+
+        if (string.IsNullOrEmpty(returnedUser.Token))
+        {
+            LoginMesssage = "Invalid username or password";
+        }
+        else
+        {
+            await localStorageService.SetItemAsync("emailAddress", returnedUser.EmailAddress);
+            await localStorageService.SetItemAsync("token", returnedUser.Token);
+            await localStorageService.SetItemAsync("expiration", returnedUser.Expiration);
+
+            await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
+            NavigationManager.NavigateTo("/index");
+        }
+
+        return await Task.FromResult(true);
+    }
+
+}

@@ -1,5 +1,4 @@
-﻿
-@page "/login"
+﻿@page "/login"
 @using pro_Server.Models
 @using pro_Server.Helpers
 @using pro_Server.Services
@@ -9,66 +8,67 @@
 @inject IUserService userService
 @inject IJSRuntime jsRunTime
 
+
 <EditForm Model="@User" OnValidSubmit="@ValidateUser">
-    <div>
-        <br /><br /><br /><br /><br />
-    </div>
-    <div>
-        <h3 style="font-weight:bold; color:purple">Book Stores Login</h3>
-    </div>
-    <div>
-        <br />
-    </div>
-    <div class="col-12 row">
-        <input class="form-control col-12" @bind="User.EmailAddress" placeholder="email address" />
-    </div>
-    <br />
-    <div class="col-12 row">
-        <input type="password" class="form-control col-12" @bind="User.Password" placeholder="password" />
-    </div>
-    <br />
-    <div class="col-12 row">
-        <span class="col-12"></span>
-        <input type="submit" class="form-control col-6 btn btn-primary" value="Login" />
-        <a href="/signup" class="col-3">Sign up</a>
-    </div>
-    <br />
-    <div class="col-12 row" style="text-align:left; font-weight:bold">
-         <span class="col-12">@LoginMesssage</span>
+    <div class="signup-form">
+        <div class="box">
+            <h2>Login</h2>
+            <br /><br />
+            <p style="font-size:12px; color:indianred">@LoginMesssage</p>
+            <br />
+
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-paper-plane"></i></span>
+                    <input @bind="User.EmailAddress" type="email" class="form-control" name="email" placeholder="Email Address" required="required">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                    <input @bind="User.Password" type="password" class="form-control" name="password" placeholder="Password" required="required">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Login</button>
+            </div>
+        </div>
+        <div class="text-center">Don't have an account? <a href="signup"> Create Account</a></div>
     </div>
 </EditForm>
+<link href="css/LoginForm.css" rel="stylesheet" />
 
-@code {
 
-    private User User;
-    public string LoginMesssage { get; set; }
+@code { private User User;
+            public string LoginMesssage { get; set; }
 
-    protected async override Task OnInitializedAsync()
-    {
-        User = new User();
-    }
+            protected async override Task OnInitializedAsync()
+            {
+                User = new User();
+            }
 
-    private async Task<bool> ValidateUser()
-    {
-        //assume that user is valid
-        //call an API
+            private async Task<bool> ValidateUser()
+            {
+                //assume that user is valid
+                //call an API
 
-        var returnedUser = await userService.LoginAsync(User);
+                var returnedUser = await userService.LoginAsync(User);
 
-        if (string.IsNullOrEmpty(returnedUser.Token))
-        {
-            LoginMesssage = "Invalid username or password";
-        }
-        else
-        {
-            await localStorageService.SetItemAsync("emailAddress", returnedUser.EmailAddress);
-            await localStorageService.SetItemAsync("token", returnedUser.Token);
-            await localStorageService.SetItemAsync("expiration", returnedUser.Expiration);
+                if (string.IsNullOrEmpty(returnedUser.Token))
+                {
+                    LoginMesssage = "Invalid username or password";
+                }
+                else
+                {
+                    await localStorageService.SetItemAsync("emailAddress", returnedUser.EmailAddress);
+                    await localStorageService.SetItemAsync("token", returnedUser.Token);
+                    await localStorageService.SetItemAsync("expiration", returnedUser.Expiration);
 
-            await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
-            NavigationManager.NavigateTo("/index");
-        }
+                    await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
+                    NavigationManager.NavigateTo("/index");
+                }
 
-        return await Task.FromResult(true);
-    }
-}
+                return await Task.FromResult(true);
+            } }
