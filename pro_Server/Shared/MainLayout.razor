@@ -25,6 +25,14 @@
     </div>
 </div>
 
+<BlazoredToasts Position="Blazored.Toast.Configuration.ToastPosition.BottomRight"
+                Timeout="10"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                ErrorIcon="fa fa-bug"
+                SuccessIcon="fa fa-thumbs-up"
+                ShowProgressBar="@true" />
+
 @code{
     public async Task Logout()
     {

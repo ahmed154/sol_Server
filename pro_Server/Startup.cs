@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using Blazored.Toast;
 using BlazorServerApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -37,6 +38,7 @@ namespace pro_Server
             services.AddTransient<ValidateHeaderHandler>();
             services.AddBlazoredLocalStorage();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            services.AddBlazoredToast();
 
             services.AddHttpClient<IUserService, UserService>(client =>
             {
